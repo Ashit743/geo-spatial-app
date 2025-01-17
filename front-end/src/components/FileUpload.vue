@@ -9,34 +9,39 @@ const emit = defineEmits<{
 }>()
 
 const uploadedFiles = ref<File[]>([])
-// Ref to your custom input component
-const fileInputRef = ref<InstanceType<typeof Input> | null>(null)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+
+const resetFileInput = () => {
+  if (fileInputRef.value) {
+    fileInputRef.value.value = ''
+  }
+}
 
 const handleFileChange = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.files) {
-    uploadedFiles.value = Array.from(input.files)
+    uploadedFiles.value = [...uploadedFiles.value, ...Array.from(input.files)]
   }
+  resetFileInput()
 }
 
 const removeFile = (index: number) => {
   uploadedFiles.value.splice(index, 1)
+  if (uploadedFiles.value.length === 0) {
+    resetFileInput()
+  }
 }
 
 const submitFiles = () => {
   if (uploadedFiles.value.length > 0) {
     emit('uploadFiles', uploadedFiles.value)
-    uploadedFiles.value = [] // Clear the files after submitting
-    if (fileInputRef.value) {
-      // Clear the file input when files are submitted
-      fileInputRef.value.modelValue = '' // Clear the modelValue bound to the input
-    }
+    uploadedFiles.value = []
+    resetFileInput()
   }
 }
 
 const triggerFileInput = () => {
-  if (fileInputRef.value && fileInputRef.value.inputRef) {
-    // Trigger the file input dialog from the custom component's input element
+  if (fileInputRef.value) {
     fileInputRef.value.inputRef.click()
   }
 }
@@ -45,7 +50,6 @@ const triggerFileInput = () => {
 <template>
   <div class="file-upload space-y-4">
     <div class="flex items-center space-x-4">
-      <!-- Custom Input Component for File Selection -->
       <Input
         ref="fileInputRef"
         type="file"
@@ -54,7 +58,6 @@ const triggerFileInput = () => {
         @change="handleFileChange"
         class="hidden"
       />
-      <!-- Button to Trigger File Input Click -->
       <Button @click="triggerFileInput" variant="outline">
         <UploadCloud class="mr-2 h-4 w-4" />
         Choose Files
@@ -89,3 +92,4 @@ const triggerFileInput = () => {
     </Button>
   </div>
 </template>
+
