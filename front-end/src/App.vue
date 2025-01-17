@@ -9,16 +9,13 @@ import ToastProvider from '@/components/ui/toast/ToastProvider.vue'
 const { isDark, toggleDark } = useTheme()
 const route = useRoute()
 
-const showNavbar = computed(() => {
-  return !['login', 'register'].includes(route.name as string)
-})
 </script>
 
 <template>
   <ToastProvider>
     <div :class="{ 'dark': isDark }">
       <div class="min-h-screen bg-background text-foreground">
-        <header v-if="showNavbar" class="border-b">
+        <header  class="border-b">
           <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <nav class="space-x-4">
               <router-link to="/" class="text-foreground hover:text-primary transition-colors">Home</router-link>

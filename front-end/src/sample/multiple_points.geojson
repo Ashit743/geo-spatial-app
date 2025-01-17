@@ -1,0 +1,20 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [-77.0369, 38.9072],
+            [-77.0469, 38.9172],
+            [-77.0569, 38.9272]
+          ]
+        },
+        "properties": {
+          "name": "Sample Line"
+        }
+      }
+    ]
+  }
+  

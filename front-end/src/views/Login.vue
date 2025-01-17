@@ -36,7 +36,7 @@ const handleLogin = () => {
     title: 'Success',
     description: 'Login successful!',
   })
-  router.push('/map')
+  router.push('/')
 }
 </script>
 

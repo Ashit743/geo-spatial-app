@@ -1,0 +1,24 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-77.0369, 38.9072],
+              [-77.0369, 38.8972],
+              [-77.0269, 38.8972],
+              [-77.0269, 38.9072],
+              [-77.0369, 38.9072]
+            ]
+          ]
+        },
+        "properties": {
+          "name": "Washington DC"
+        }
+      }
+    ]
+  }
+  
