@@ -3,7 +3,7 @@ import type { ToastProps } from '.'
 import { computed, ref } from 'vue'
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 5000
 
 export type StringOrVNode =
   | string
@@ -57,9 +57,11 @@ interface State {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
-function addToRemoveQueue(toastId: string) {
-  if (toastTimeouts.has(toastId))
-    return
+function addToRemoveQueue(toastId: string, immediate: boolean = false) {
+  if (toastTimeouts.has(toastId)) {
+    clearTimeout(toastTimeouts.get(toastId))
+    toastTimeouts.delete(toastId)
+  }
 
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId)
@@ -67,7 +69,7 @@ function addToRemoveQueue(toastId: string) {
       type: actionTypes.REMOVE_TOAST,
       toastId,
     })
-  }, TOAST_REMOVE_DELAY)
+  }, immediate ? 0 : TOAST_REMOVE_DELAY)
 
   toastTimeouts.set(toastId, timeout)
 }
@@ -80,6 +82,7 @@ function dispatch(action: Action) {
   switch (action.type) {
     case actionTypes.ADD_TOAST:
       state.value.toasts = [action.toast, ...state.value.toasts].slice(0, TOAST_LIMIT)
+      addToRemoveQueue(action.toast.id)
       break
 
     case actionTypes.UPDATE_TOAST:
@@ -92,11 +95,11 @@ function dispatch(action: Action) {
       const { toastId } = action
 
       if (toastId) {
-        addToRemoveQueue(toastId)
+        addToRemoveQueue(toastId, true)
       }
       else {
         state.value.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id)
+          addToRemoveQueue(toast.id, true)
         })
       }
 

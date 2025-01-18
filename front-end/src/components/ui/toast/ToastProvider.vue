@@ -1,8 +1,14 @@
 <script setup lang="ts">
+import { XIcon } from 'lucide-vue-next'
 import { ToastProvider } from 'radix-vue'
 import { useToast } from './use-toast'
+import { Button } from '@/components/ui/button'
 
-const { toasts } = useToast()
+const { toasts, dismiss } = useToast()
+
+const handleDismiss = (toastId: string) => {
+  dismiss(toastId)
+}
 </script>
 
 <template>
@@ -23,7 +29,7 @@ const { toasts } = useToast()
             'dark:bg-background dark:text-foreground dark:border-border',
           ]"
         >
-          <div class="grid gap-1">
+          <div class="grid gap-1 pr-6">
             <div class="text-sm font-semibold">
               {{ toast.title }}
             </div>
@@ -31,8 +37,17 @@ const { toasts } = useToast()
               {{ toast.description }}
             </div>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="absolute right-2 top-2"
+            @click="handleDismiss(toast.id)"
+          >
+            <XIcon class="h-4 w-4" />
+          </Button>
         </div>
       </TransitionGroup>
     </div>
   </ToastProvider>
 </template>
+

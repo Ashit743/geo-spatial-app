@@ -11,7 +11,7 @@ export interface Dataset {
   selected: boolean;
 }
 
-export const useDatasetStore = defineStore('dataset', () => {
+export const useDatasetStore = defineStore('Dataset', () => {
   const datasets = ref<Dataset[]>([])
   const defaultGeoJSON = ref({
     type: "FeatureCollection",
@@ -22,11 +22,22 @@ export const useDatasetStore = defineStore('dataset', () => {
     datasets.value = [...datasets.value, ...newDatasets]
   }
 
+  const updateVisibilityAndSelection = (datasetId: string, isVisible: boolean) => {
+    const dataset = datasets.value.find(d => d.id === datasetId);
+    if (dataset) {
+      dataset.visible = isVisible;
+      dataset.selected = isVisible; // Automatically select if visible
+    }
+  };
+  
+
   const toggleDatasetVisibility = (datasetId: string) => {
     const dataset = datasets.value.find(d => d.id === datasetId)
     if (dataset) {
       dataset.visible = !dataset.visible
+      dataset.visible === true ?dataset.selected = true: dataset.selected = false
     }
+
   }
 
   const updateDatasetGeoJSON = (datasetId: string, newGeoJSON: any) => {
@@ -42,6 +53,7 @@ export const useDatasetStore = defineStore('dataset', () => {
 
   const toggleDatasetSelection = (datasetId: string) => {
     const dataset = datasets.value.find(d => d.id === datasetId)
+    debugger;
     if (dataset) {
       dataset.selected = !dataset.selected
     }
@@ -66,6 +78,7 @@ export const useDatasetStore = defineStore('dataset', () => {
     addDatasets,
     toggleDatasetVisibility,
     updateDatasetGeoJSON,
+    updateVisibilityAndSelection,
     visibleDatasets,
     selectedDatasets,
     toggleDatasetSelection,
