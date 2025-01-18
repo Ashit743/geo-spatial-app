@@ -8,6 +8,7 @@ export interface Dataset {
   visible: boolean;
   layerId: string;
   geojson: any;
+  selected: boolean;
 }
 
 export const useDatasetStore = defineStore('dataset', () => {
@@ -37,10 +38,26 @@ export const useDatasetStore = defineStore('dataset', () => {
 
   const visibleDatasets = computed(() => datasets.value.filter(d => d.visible))
 
-  const activeDataset = ref<Dataset | null>(null)
+  const selectedDatasets = computed(() => datasets.value.filter(d => d.selected))
 
-  const setActiveDataset = (datasetId: string | null) => {
-    activeDataset.value = datasetId ? datasets.value.find(d => d.id === datasetId) || null : null
+  const toggleDatasetSelection = (datasetId: string) => {
+    const dataset = datasets.value.find(d => d.id === datasetId)
+    if (dataset) {
+      dataset.selected = !dataset.selected
+    }
+  }
+
+  const updateSelectedDatasetsGeoJSON = (newGeoJSON: any) => {
+    const features = newGeoJSON.features
+    let featureIndex = 0
+    for (const dataset of selectedDatasets.value) {
+      const datasetFeatureCount = dataset.geojson?.features?.length || 0
+      dataset.geojson = {
+        type: "FeatureCollection",
+        features: features.slice(featureIndex, featureIndex + datasetFeatureCount)
+      }
+      featureIndex += datasetFeatureCount
+    }
   }
 
   return {
@@ -50,8 +67,8 @@ export const useDatasetStore = defineStore('dataset', () => {
     toggleDatasetVisibility,
     updateDatasetGeoJSON,
     visibleDatasets,
-    activeDataset,
-    setActiveDataset
+    selectedDatasets,
+    toggleDatasetSelection,
+    updateSelectedDatasetsGeoJSON
   }
 })
-

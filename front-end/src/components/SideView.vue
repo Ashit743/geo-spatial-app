@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useDatasetStore } from '@/stores/useDatasetStore'
 import FileUpload from '@/components/FileUpload.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,7 +18,8 @@ const handleFileUpload = (files: File[]) => {
     file,
     visible: true,
     layerId: `layer-${Date.now()}-${index}`,
-    geojson: null
+    geojson: null,
+    selected: false
   }))
   store.addDatasets(newDatasets)
 }
@@ -26,17 +27,27 @@ const handleFileUpload = (files: File[]) => {
 const jsonContent = ref('')
 
 const activeDatasetJson = computed(() => {
-  if (store.activeDataset) {
-    return JSON.stringify(store.activeDataset.geojson, null, 2)
+  if (store.selectedDatasets.length > 0) {
+    const combinedFeatures = store.selectedDatasets.flatMap(dataset => 
+      dataset.geojson?.features || []
+    )
+    return JSON.stringify({
+      type: "FeatureCollection",
+      features: combinedFeatures
+    }, null, 2)
   }
   return ''
 })
 
+watch(activeDatasetJson, (newValue) => {
+  jsonContent.value = newValue
+})
+
 const updateJson = () => {
-  if (store.activeDataset) {
+  if (store.selectedDatasets.length > 0) {
     try {
       const newGeoJSON = JSON.parse(jsonContent.value)
-      store.updateDatasetGeoJSON(store.activeDataset.id, newGeoJSON)
+      store.updateSelectedDatasetsGeoJSON(newGeoJSON)
     } catch (error) {
       console.error('Invalid JSON:', error)
       // You might want to show an error message to the user here
@@ -82,8 +93,8 @@ const updateJson = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    @click="store.setActiveDataset(dataset.id)"
-                    :class="{ 'bg-primary/20': store.activeDataset?.id === dataset.id }"
+                    @click="store.toggleDatasetSelection(dataset.id)"
+                    :class="{ 'bg-primary/20': dataset.selected }"
                   >
                     <Code class="h-4 w-4" />
                   </Button>
@@ -110,7 +121,7 @@ const updateJson = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div v-if="store.activeDataset">
+            <div v-if="store.selectedDatasets.length > 0">
               <Textarea
                 v-model="jsonContent"
                 :placeholder="activeDatasetJson"
@@ -126,4 +137,3 @@ const updateJson = () => {
     </Tabs>
   </div>
 </template>
-
