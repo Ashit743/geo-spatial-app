@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useDatasetStore } from '@/stores/useDatasetStore'
 import { storeToRefs } from 'pinia'
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 const store = useDatasetStore()
 const { datasets, visibleDatasets, defaultGeoJSON } = storeToRefs(store)
@@ -22,6 +23,8 @@ if (!mapboxToken) {
   mapboxgl.accessToken = mapboxToken
 }
 
+const draw = ref<MapboxDraw | null>(null);
+
 // Initialize Map
 const initializeMap = () => {
   if (mapContainer.value && !map.value && !error.value) {
@@ -34,6 +37,16 @@ const initializeMap = () => {
       })
       
       map.value.addControl(new mapboxgl.NavigationControl())
+      draw.value = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+          polygon: true,
+          line_string: true,
+          point: true,
+          trash: true,
+        },
+      });
+      map.value.addControl(draw.value);
       map.value.addControl(new mapboxgl.FullscreenControl())
       
       map.value.on('load', () => {

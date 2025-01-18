@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-draw": "^1.5.0",
     "@radix-icons/vue": "^1.0.0",
     "@vueuse/core": "^12.4.0",
     "class-variance-authority": "^0.7.1",
