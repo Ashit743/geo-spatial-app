@@ -72,22 +72,13 @@ const triggerFileInput = () => {
         :key="index"
         class="flex justify-between items-center p-2 bg-secondary rounded"
       >
-        <span class="text-sm">{{ file.name }}</span>
-        <Button
-          variant="ghost"
-          size="sm"
-          @click="removeFile(index)"
-          class="text-destructive hover:text-destructive-foreground hover:bg-destructive"
-        >
+        <span class="text-sm truncate mr-2">{{ file.name }}</span>
+        <Button @click="removeFile(index)" variant="ghost" size="sm">
           Remove
         </Button>
       </li>
     </ul>
-    <Button
-      @click="submitFiles"
-      :disabled="uploadedFiles.length === 0"
-      :class="{ 'opacity-50 cursor-not-allowed': uploadedFiles.length === 0 }"
-    >
+    <Button @click="submitFiles" :disabled="uploadedFiles.length === 0">
       Upload Files
     </Button>
   </div>
