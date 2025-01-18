@@ -25,6 +25,56 @@ if (!mapboxToken) {
 
 const draw = ref<MapboxDraw | null>(null);
 
+const setupDrawEvents = () => {
+  if (map.value && draw.value) {
+    map.value.on('draw.create', (e) => {
+      saveDrawnShapes(e.features);
+    });
+
+    map.value.on('draw.update', (e) => {
+      saveDrawnShapes(e.features);
+    });
+
+    map.value.on('draw.delete', (e) => {
+      deleteShapes(e.features);
+    });
+  }
+};
+
+// Save new or updated shapes
+const saveDrawnShapes = (features: GeoJSON.Feature[]) => {
+  // Add or update these features in the store
+  const newFeatures = features.map((feature) => ({
+    id: feature.id, // Mapbox Draw provides unique IDs
+    geojson: {
+      type: "FeatureCollection", 
+      features: [feature] // wrap the feature in a FeatureCollection
+    },
+  }));
+debugger;
+  // Save shapes to the store
+  const datasetsToAdd = newFeatures.map((f) => ({
+  id: String(f.id),
+  name: `Shape-${f.id}`,
+  file: new File([], String(f.id)),
+  visible: true,
+  layerId: `layer-${f.id}`,
+  geojson: f.geojson, 
+  selected: true,
+}));
+console.log('Transformed datasets:', datasetsToAdd);
+
+store.addDatasets(datasetsToAdd);
+
+};
+
+// Delete shapes from the store
+const deleteShapes = (features: GeoJSON.Feature[]) => {
+  features.forEach((feature) => {
+    store.datasets = store.datasets.filter((d) => d.id !== feature.id);
+  });
+};
+
 // Initialize Map
 const initializeMap = () => {
   if (mapContainer.value && !map.value && !error.value) {
@@ -52,6 +102,7 @@ const initializeMap = () => {
       map.value.on('load', () => {
         console.log('Map loaded successfully')
         loadDefaultGeoJSON()
+        setupDrawEvents()
       })
     } catch (e) {
       console.error("Error initializing map:", e)
@@ -79,6 +130,8 @@ const loadDefaultGeoJSON = () => {
     })
   }
 }
+
+
 
 // Load GeoJSON Data from File or JSON
 const loadGeoJSONData = async (dataset: Dataset) => {

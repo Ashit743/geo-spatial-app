@@ -30,6 +30,7 @@ const handleFileUpload = (files: File[]) => {
 const jsonContent = ref('')
 
 const activeDatasetJson = computed(() => {
+  debugger;
   if (store.selectedDatasets.length > 0) {
     const combinedFeatures = store.selectedDatasets.flatMap(dataset => 
       dataset.geojson?.features || []

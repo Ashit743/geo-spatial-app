@@ -20,6 +20,7 @@ export const useDatasetStore = defineStore('Dataset', () => {
 
   const addDatasets = (newDatasets: Dataset[]) => {
     datasets.value = [...datasets.value, ...newDatasets]
+    console.log('Adding datasets to store:', newDatasets);
   }
 
   const updateVisibilityAndSelection = (datasetId: string, isVisible: boolean) => {
@@ -71,6 +72,8 @@ export const useDatasetStore = defineStore('Dataset', () => {
       featureIndex += datasetFeatureCount
     }
   }
+
+  
 
   return {
     datasets,
