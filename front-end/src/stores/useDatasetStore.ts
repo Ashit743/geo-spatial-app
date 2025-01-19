@@ -19,9 +19,24 @@ export const useDatasetStore = defineStore('Dataset', () => {
   })
 
   const addDatasets = (newDatasets: Dataset[]) => {
-    datasets.value = [...datasets.value, ...newDatasets]
-    console.log('Adding datasets to store:', newDatasets);
-  }
+    if (!Array.isArray(newDatasets)) {
+      console.error("addDatasets expects an array of datasets:", newDatasets);
+      return;
+    }
+  
+    // Filter out datasets with duplicate IDs
+    const uniqueDatasets = newDatasets.filter(
+      (newDataset) => !datasets.value.some((existingDataset) => existingDataset.id === newDataset.id)
+    );
+  
+    if (uniqueDatasets.length > 0) {
+      datasets.value = [...datasets.value, ...uniqueDatasets];
+      console.log("Adding unique datasets to store:", uniqueDatasets);
+    } else {
+      console.log("No unique datasets to add.");
+    }
+  };
+
 
   const updateVisibilityAndSelection = (datasetId: string, isVisible: boolean) => {
     const dataset = datasets.value.find(d => d.id === datasetId);
@@ -72,7 +87,17 @@ export const useDatasetStore = defineStore('Dataset', () => {
     }
   }
 
-  
+  const removeDataset = (datasetId: string) => {
+    const index = datasets.value.findIndex(d => d.id === datasetId);
+    if (index !== -1) {
+      datasets.value.splice(index, 1);
+      
+      // Also remove from localStorage if needed
+      const savedShapes = JSON.parse(localStorage.getItem('savedShapes') || '[]');
+      const updatedShapes = savedShapes.filter((shape: any) => shape.id !== datasetId);
+      localStorage.setItem('savedShapes', JSON.stringify(updatedShapes));
+    }
+  }
 
   return {
     datasets,
@@ -84,6 +109,7 @@ export const useDatasetStore = defineStore('Dataset', () => {
     visibleDatasets,
     selectedDatasets,
     toggleDatasetSelection,
-    updateSelectedDatasetsGeoJSON
+    updateSelectedDatasetsGeoJSON,
+    removeDataset
   }
 })
