@@ -11,6 +11,13 @@ export default defineConfig({
       plugins: [tailwind(), autoprefixer()],
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: '/index.html',
+      },
+    },
+  },
   plugins: [vue()],
   resolve: {
     alias: {
