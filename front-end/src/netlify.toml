@@ -9,22 +9,22 @@
 [[headers]]
   for = "/*.js"
   [headers.values]
-    Content-Type = "text/javascript"
+    Content-Type = "application/javascript"
 
 [[headers]]
   for = "/*.mjs"
   [headers.values]
-    Content-Type = "text/javascript"
+    Content-Type = "application/javascript"
 
 [[headers]]
   for = "/src/*.js"
   [headers.values]
-    Content-Type = "text/javascript"
+    Content-Type = "application/javascript"
 
 [[headers]]
   for = "/src/*.mjs"
   [headers.values]
-    Content-Type = "text/javascript"
+    Content-Type = "application/javascript"
 
 [build]
   publish = "dist"
