@@ -50,7 +50,7 @@ const isDark = inject('isDark')
 
       <footer class="py-6 px-4 sm:px-6 lg:px-8 z-10">
         <div :class="isDark ? 'text-gray-300' : 'text-gray-600'" class="max-w-7xl mx-auto text-center text-sm">
-          © 2023 Geospatial Explorer. All rights reserved.
+          © 2025 Geospatial Explorer. All rights reserved.
         </div>
       </footer>
     </div>

@@ -25,10 +25,21 @@ const init = () => {
   renderer.value.setSize(window.innerWidth, window.innerHeight)
   renderer.value.setPixelRatio(window.devicePixelRatio)
 
-  const light = new THREE.DirectionalLight('#ffffff', 1)
-  light.position.set(5, 3, 5)
-  scene.value.add(light)
+  // Directional Light (increased intensity)
+  const directionalLight = new THREE.DirectionalLight('#ffffff', 1.5)
+  directionalLight.position.set(5, 3, 5)
+  scene.value.add(directionalLight)
 
+  // Ambient Light for overall brightness
+  const ambientLight = new THREE.AmbientLight(0x404040, 1) // Soft white light
+  scene.value.add(ambientLight)
+
+  // Point Light to add additional focus light
+  const pointLight = new THREE.PointLight(0xffffff, 2, 10) // White light with high intensity
+  pointLight.position.set(0, 1, 2)
+  scene.value.add(pointLight)
+
+  // Load textures and globe
   const textureLoader = new THREE.TextureLoader()
   const dayTexture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg')
 
@@ -76,4 +87,3 @@ onUnmounted(() => {
 <template>
   <canvas ref="canvasRef" class="w-full h-full"></canvas>
 </template>
-
