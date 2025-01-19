@@ -16,7 +16,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow requests from your Vue.js frontend
+  origin: ['http://localhost:5173','https://geo-spatial.netlify.app'], // Allow requests from your Vue.js frontend
   credentials: true,
 }));
 app.use(express.json());
