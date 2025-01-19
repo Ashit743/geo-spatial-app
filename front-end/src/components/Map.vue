@@ -51,7 +51,6 @@ const saveDrawnShapes = (features: GeoJSON.Feature[]) => {
       features: [feature] // wrap the feature in a FeatureCollection
     },
   }));
-debugger;
   // Save shapes to the store
   const datasetsToAdd = newFeatures.map((f) => ({
   id: String(f.id),

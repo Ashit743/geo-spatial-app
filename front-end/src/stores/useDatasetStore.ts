@@ -54,7 +54,6 @@ export const useDatasetStore = defineStore('Dataset', () => {
 
   const toggleDatasetSelection = (datasetId: string) => {
     const dataset = datasets.value.find(d => d.id === datasetId)
-    debugger;
     if (dataset) {
       dataset.selected = !dataset.selected
     }

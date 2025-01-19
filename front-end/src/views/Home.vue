@@ -1,74 +1,59 @@
-<script setup lang="ts">
+<script setup>
+import { inject } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
-import { MapPin, Upload, Layers } from 'lucide-vue-next'
+import { MapPin } from 'lucide-vue-next'
+import EarthVisualization from '@/components/EarthVisualization.vue'
+
+// Inject isDark from parent component
+const isDark = inject('isDark')
 </script>
 
 <template>
-  <div class="min-h-screen bg-background flex flex-col">
-    <header class="py-6 px-4 sm:px-6 lg:px-8 border-b">
-      <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-foreground">Geospatial App</h1>
-      </div>
-    </header>
-    
-    <main class="flex-grow container mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+  <div class="relative w-full h-screen overflow-hidden">
+    <div class="absolute inset-0 flex items-center justify-center">
+      <EarthVisualization :isDarkMode="isDark" class="w-full h-full" />
+    </div>
+
+    <div class="absolute inset-0 flex flex-col">
+      <header class="py-6 px-4 sm:px-6 lg:px-8 z-10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+          <h1 class="text-3xl font-bold" :class="isDark ? 'text-white' : 'text-black'">Geospatial Explorer</h1>
+        </div>
+      </header>
+
+      <main class="flex-grow container mx-auto py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center z-10">
+        <Card class="w-full max-w-md" :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'">
           <CardHeader>
-            <CardTitle class="flex items-center space-x-2">
+            <CardTitle class="flex items-center space-x-2" :class="isDark ? 'text-white' : 'text-black'">
               <MapPin class="h-6 w-6" />
-              <span>Interactive Map</span>
+              <span>Interactive Global Map</span>
             </CardTitle>
-            <CardDescription>Explore geospatial data visually</CardDescription>
+            <CardDescription :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              Explore our world in stunning detail
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Our interactive map allows you to visualize and analyze geospatial data with ease.</p>
+            <p :class="isDark ? 'text-gray-200' : 'text-gray-800'">
+              Dive into our interactive map and discover the beauty of geospatial data.
+            </p>
           </CardContent>
           <CardFooter>
-            <Button><router-link to="/map">Open Map</router-link></Button>
+            <Button class="w-full bg-blue-600 hover:bg-blue-700 text-white">
+              <router-link to="/map" class="w-full h-full flex items-center justify-center">
+                Explore the Map
+              </router-link>
+            </Button>
           </CardFooter>
         </Card>
+      </main>
 
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center space-x-2">
-              <Upload class="h-6 w-6" />
-              <span>File Upload</span>
-            </CardTitle>
-            <CardDescription>Import your geospatial data</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Upload your GeoJSON files to visualize and analyze your custom datasets.</p>
-          </CardContent>
-          <CardFooter>
-            <Button><router-link to="/map">Upload Files</router-link></Button>
-          </CardFooter>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center space-x-2">
-              <Layers class="h-6 w-6" />
-              <span>Data Management</span>
-            </CardTitle>
-            <CardDescription>Manage your datasets</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Easily manage, toggle visibility, and edit your uploaded geospatial datasets.</p>
-          </CardContent>
-          <CardFooter>
-            <Button><router-link to="/map">Manage Data</router-link></Button>
-          </CardFooter>
-        </Card>
-      </div>
-    </main>
-
-    <footer class="py-6 px-4 sm:px-6 lg:px-8 border-t">
-      <div class="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
-        © 2023 Geospatial App. All rights reserved.
-      </div>
-    </footer>
+      <footer class="py-6 px-4 sm:px-6 lg:px-8 z-10">
+        <div :class="isDark ? 'text-gray-300' : 'text-gray-600'" class="max-w-7xl mx-auto text-center text-sm">
+          © 2023 Geospatial Explorer. All rights reserved.
+        </div>
+      </footer>
+    </div>
   </div>
 </template>
 
