@@ -7,16 +7,18 @@ import NotFound from "@/views/NotFound.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 
+
 // Define routes
 const routes = [
   {
     path: "/",
     name: "Home",
     component: Home,
+    meta: { requiresAuth: true } 
   },
   { path: "/login", 
     name: "Login", 
-    component: Login 
+    component: Login,
   },
   { path: "/register", 
     name: "Register", 
@@ -26,6 +28,7 @@ const routes = [
     path: "/map",
     name: "MapPage",
     component: MapPage,
+    meta: { requiresAuth: true } 
   },
   {
     path: "/:pathMatch(.*)*",
@@ -44,7 +47,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
   if (to.matched.some(record => record.meta.requiresAuth) && !token) {
-    next('/');
+    next('/login');
   } else {
     next();
   }

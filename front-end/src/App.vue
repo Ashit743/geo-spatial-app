@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { useTheme } from '@/composables/useTheme'
 import { Button } from '@/components/ui/button'
 import { Sun, Moon } from 'lucide-vue-next'
 import ToastProvider from '@/components/ui/toast/ToastProvider.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const { isDark, toggleDark } = useTheme()
-const route = useRoute()
+
+const authStore = useAuthStore(); 
+
+const isAuthenticated = computed(() => authStore.isAuthenticated); 
 
 </script>
 
@@ -15,9 +18,9 @@ const route = useRoute()
   <ToastProvider>
     <div :class="{ 'dark': isDark }">
       <div class="min-h-screen bg-background text-foreground">
-        <header  class="border-b">
+        <header v-if="isAuthenticated" class="border-b">
           <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <nav class="space-x-4">
+            <nav class="space-x-4" >
               <router-link to="/" class="text-foreground hover:text-primary transition-colors">Home</router-link>
               <router-link to="/map" class="text-foreground hover:text-primary transition-colors">Map</router-link>
             </nav>
