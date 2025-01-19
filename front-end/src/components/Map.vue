@@ -50,14 +50,20 @@ const linestring = ref({
 const setupDrawEvents = () => {
   if (map.value && draw.value) {
     map.value.on('draw.create', async (e) => {
+      // @ts-ignore
+
       await saveDrawnShapes(e.features);
     });
 
     map.value.on('draw.update', async (e) => {
+      // @ts-ignore
+
       await saveDrawnShapes(e.features);
     });
 
     map.value.on('draw.delete', (e) => {
+      // @ts-ignore
+
       deleteShapes(e.features);
     });
   }
@@ -191,6 +197,7 @@ const loadDefaultGeoJSON = () => {
   if (map.value) {
     map.value.addSource('default', {
       type: 'geojson',
+      // @ts-ignore
       data: defaultGeoJSON.value
     })
 
@@ -472,6 +479,8 @@ const initializeDrawingControls = () => {
     if (isMeasuring.value) {
       updateMeasurement(e);
     } else {
+      // @ts-ignore
+
       saveDrawnShapes(e.features);
     }
   });
@@ -480,6 +489,8 @@ const initializeDrawingControls = () => {
     if (isMeasuring.value) {
       updateMeasurement(e);
     } else {
+      // @ts-ignore
+
       saveDrawnShapes(e.features);
     }
   });
@@ -494,6 +505,8 @@ const initializeDrawingControls = () => {
         }
       });
     } else {
+      // @ts-ignore
+
       deleteShapes(e.features);
     }
   });
@@ -602,9 +615,6 @@ onUnmounted(() => {
           top: `${hoverCoordinates.y + 10}px`
         }"
       />
-    </div>
-    <div class="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded text-sm" v-if="distanceGeojson.features.length > 1">
-      Total distance: {{ turf.length(linestring).toLocaleString() }}km
     </div>
     <div class="absolute top-4 left-16 px-4 py-2 bg-black/75 rounded-md shadow-md z-10">
       <span class="font-semibold text-sm text-white">

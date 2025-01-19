@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue' 
-import type { HTMLAttributes, Ref } from 'vue'
+import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
 import { useVModel } from '@vueuse/core'
 

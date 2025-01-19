@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000'; // Replace with your API URL
+const API_URL = 'https://geo-spatial-app.onrender.com/'; // Replace with your API URL
 
 export interface Dataset {
   id: string;

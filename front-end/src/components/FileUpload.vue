@@ -42,6 +42,8 @@ const submitFiles = () => {
 
 const triggerFileInput = () => {
   if (fileInputRef.value) {
+    // @ts-ignore
+
     fileInputRef.value.inputRef.click()
   }
 }
