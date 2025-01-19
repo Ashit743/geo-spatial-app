@@ -5,37 +5,30 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast/use-toast'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const { toast } = useToast()
+const authStore = useAuthStore()
 
 const email = ref<string>('')
 const password = ref<string>('')
 
-const handleRegister = () => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]') as {
-    email: string
-    password: string
-  }[]
-  
-  const existingUser = users.find((user) => user.email === email.value)
-
-  if (existingUser) {
+const handleRegister = async () => {
+  try {
+    await authStore.register(email.value, password.value)
+    toast({
+      title: 'Success',
+      description: 'Registration successful! Please log in.',
+    })
+    router.push('/login')
+  } catch (error) {
     toast({
       title: 'Error',
-      description: 'User already exists. Please log in.',
+      description: 'Registration failed. Please try again.',
       variant: 'destructive',
     })
-    return
   }
-
-  users.push({ email: email.value, password: password.value })
-  localStorage.setItem('users', JSON.stringify(users))
-  toast({
-    title: 'Success',
-    description: 'Registration successful! Please log in.',
-  })
-  router.push('/login')
 }
 </script>
 

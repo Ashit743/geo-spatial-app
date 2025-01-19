@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import passport from 'passport';
+import cors from 'cors';
 import authRoutes from './routes/auth';
 import datasetRoutes from './routes/datasets';
 import connectDB from './config/database';
@@ -14,6 +15,10 @@ const port = process.env.PORT || 3000;
 connectDB();
 
 // Middleware
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow requests from your Vue.js frontend
+  credentials: true,
+}));
 app.use(express.json());
 app.use(passport.initialize());
 

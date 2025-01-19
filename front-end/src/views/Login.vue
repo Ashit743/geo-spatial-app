@@ -5,38 +5,30 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast/use-toast'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const { toast } = useToast()
+const authStore = useAuthStore()
 
 const email = ref<string>('')
 const password = ref<string>('')
 
-const handleLogin = () => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]') as {
-    email: string
-    password: string
-  }[]
-
-  const user = users.find(
-    (user) => user.email === email.value && user.password === password.value
-  )
-
-  if (!user) {
+const handleLogin = async () => {
+  try {
+    await authStore.login(email.value, password.value)
+    toast({
+      title: 'Success',
+      description: 'Login successful!',
+    })
+    router.push('/map')
+  } catch (error) {
     toast({
       title: 'Error',
       description: 'Invalid credentials!',
       variant: 'destructive',
     })
-    return
   }
-
-  localStorage.setItem('authToken', 'dummy-token')
-  toast({
-    title: 'Success',
-    description: 'Login successful!',
-  })
-  router.push('/')
 }
 </script>
 
