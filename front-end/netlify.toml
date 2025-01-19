@@ -1,0 +1,10 @@
+# netlify.toml
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Type = "text/javascript"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
