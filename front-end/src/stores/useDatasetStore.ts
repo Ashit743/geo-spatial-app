@@ -99,6 +99,14 @@ export const useDatasetStore = defineStore('Dataset', () => {
     }
   }
 
+  const deleteDataset = (id: string) => {
+    datasets.value = datasets.value.filter(dataset => dataset.id !== id)
+  }
+
+  const clearAllDatasets = () => {
+    datasets.value = []
+  }
+
   return {
     datasets,
     defaultGeoJSON,
@@ -110,6 +118,8 @@ export const useDatasetStore = defineStore('Dataset', () => {
     selectedDatasets,
     toggleDatasetSelection,
     updateSelectedDatasetsGeoJSON,
-    removeDataset
+    removeDataset,
+    deleteDataset,
+    clearAllDatasets
   }
 })

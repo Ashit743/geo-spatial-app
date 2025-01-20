@@ -1,3 +1,4 @@
+// @ts-nocheck
 <script setup lang="ts">
 import { onMounted, ref, watch, onUnmounted } from 'vue'
 import mapboxgl from 'mapbox-gl'
@@ -8,6 +9,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import MapHoverCard from './MapHoverCard.vue'
 import * as turf from '@turf/turf'
+import { useMeasurement } from '@/composables/useMeasurement'
 
 const store = useDatasetStore()
 const { datasets, visibleDatasets, defaultGeoJSON } = storeToRefs(store)
@@ -28,7 +30,8 @@ if (!mapboxToken) {
 
 const draw = ref<any>(null);
 const measureDraw = ref<any>(null);
-const isMeasuring = ref(false);
+const { isMeasuring, initializeMeasurement, toggleMeasurement, handleEscape } = useMeasurement()
+const startNewMeasurement = ref(true);
 
 const hoveredFeature = ref<any>(null);
 const hoverPopup = ref<mapboxgl.Popup | null>(null);
@@ -512,28 +515,6 @@ const initializeDrawingControls = () => {
   });
 };
 
-const toggleMeasurement = () => {
-  isMeasuring.value = !isMeasuring.value;
-
-  if (isMeasuring.value) {
-    // Switch to measurement mode
-    map.value?.removeControl(draw.value);
-    map.value?.addControl(measureDraw.value, 'top-left');
-    measureDraw.value.changeMode('draw_line_string');
-
-    // Update measurements for existing lines
-    const features = measureDraw.value.getAll().features;
-    features.forEach(feature => {
-      updateMeasurement({ features: [feature] });
-    });
-  } else {
-    // Switch back to shape drawing mode
-    map.value?.removeControl(measureDraw.value);
-    map.value?.addControl(draw.value, 'top-left');
-    measureDraw.value.deleteAll(); // Clear measurements
-  }
-};
-
 const updateMeasurement = (e: any) => {
   if (!isMeasuring.value) return;
 
@@ -586,11 +567,27 @@ const updateMeasurement = (e: any) => {
   });
 };
 
+// Handle escape key
+const handleKeyPress = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    handleEscape()
+  }
+};
+
 onMounted(() => {
   initializeMap()
+  map.value?.on('load', () => {
+    if (map.value) {
+      //@ts-ignore
+      initializeMeasurement(map.value)
+    }
+  })
+  
+  window.addEventListener('keydown', handleKeyPress)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyPress)
   if (map.value) {
     map.value.remove()
   }
@@ -616,19 +613,22 @@ onUnmounted(() => {
         }"
       />
     </div>
-    <div class="absolute top-4 left-16 px-4 py-2 bg-black/75 rounded-md shadow-md z-10">
-      <span class="font-semibold text-sm text-white">
-        {{ isMeasuring ? '📏 Distance Measurement Mode' : '✏️ Shape Drawing Mode' }}
-      </span>
-    </div>
     <button
-      @click="toggleMeasurement"
-      class="absolute bottom-4 right-4 px-4 py-2 bg-black/75 rounded-md shadow-md z-10 hover:bg-black/90"
+      @click="toggleMeasurement(map!)"
+      class="absolute top-4 left-16 px-4 py-2 bg-black/75 rounded-md shadow-md z-10 hover:bg-black/90 transition-all duration-200"
       :class="{ 'bg-red-500/90 hover:bg-red-500': isMeasuring }"
     >
       <span class="flex items-center gap-2 font-medium text-white">
-        <span v-if="isMeasuring">❌ Exit Measurement</span>
-        <span v-else>📏 Measure Distance</span>
+        <span v-if="isMeasuring">
+          <span class="flex items-center gap-2">
+            ❌ Exit Measurement
+          </span>
+        </span>
+        <span v-else>
+          <span class="flex items-center gap-2">
+            📏 Measure
+          </span>
+        </span>
       </span>
     </button>
   </div>
@@ -648,6 +648,17 @@ onUnmounted(() => {
 
 .mapboxgl-ctrl-group button:hover {
   background-color: #f8f8f8;
+}
+</style>
+
+<style scoped>
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-200 {
+  transition-duration: 200ms;
 }
 </style>
 
