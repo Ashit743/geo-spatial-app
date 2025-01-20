@@ -1,4 +1,5 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
+import { IUser } from './users';
 
 export interface IDataset extends Document {
   name: string;
@@ -7,18 +8,46 @@ export interface IDataset extends Document {
   layerId: string;
   geojson: any;
   selected: boolean;
-  user: mongoose.Types.ObjectId;
+  user: IUser['_id'];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const DatasetSchema: Schema = new Schema({
-  name: { type: String, required: true },
-  file: { type: String, required: true },
-  visible: { type: Boolean, default: true },
-  layerId: { type: String, required: true },
-  geojson: { type: Schema.Types.Mixed },
-  selected: { type: Boolean, default: false },
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+const DatasetSchema = new Schema<IDataset>({
+  name: {
+    type: String,
+    required: true,
+  },
+  file: {
+    type: String,
+    required: true,
+  },
+  visible: {
+    type: Boolean,
+    default: true,
+  },
+  layerId: {
+    type: String,
+    required: true,
+  },
+  geojson: {
+    type: Schema.Types.Mixed,
+  },
+  selected: {
+    type: Boolean,
+    default: true,
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  }
 }, { timestamps: true });
 
-export default mongoose.model<IDataset>('Dataset', DatasetSchema);
+// Create a compound index for user and name to ensure uniqueness per user
+DatasetSchema.index({ user: 1, name: 1 }, { unique: true });
+
+const Dataset = mongoose.model<IDataset>('Dataset', DatasetSchema);
+
+export default Dataset;
 
