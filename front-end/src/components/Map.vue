@@ -80,7 +80,7 @@ const setupHoverInteraction = () => {
     const features = map.value!.queryRenderedFeatures(e.point, {
       layers: datasets.value.map(d => d.layerId) // Only look at our dataset layers
     });
-    
+
     if (features.length > 0) {
       hoveredFeature.value = features[0];
       hoverCoordinates.value = { x: e.point.x, y: e.point.y };
@@ -100,27 +100,27 @@ const saveDrawnShapes = async (features: GeoJSON.Feature[]) => {
   const newFeatures = features.map((feature) => ({
     id: feature.id,
     geojson: {
-      type: "FeatureCollection", 
+      type: "FeatureCollection",
       features: [feature]
     },
   }));
-  
+
   const datasetsToAdd = newFeatures.map((f) => ({
     id: String(f.id),
     name: `Shape-${f.id}`,
     file: new File([], String(f.id)),
     visible: true,
     layerId: `layer-${f.id}`,
-    geojson: f.geojson, 
+    geojson: f.geojson,
     selected: true,
   }));
   console.log('Transformed datasets:', datasetsToAdd);
 
   store.addDatasets(datasetsToAdd);
-  
+
   // Wait for all datasets to be loaded
   await Promise.all(datasetsToAdd.map(dataset => loadGeoJSONData(dataset)));
-  
+
   // Now update the bounds after all data is loaded
   updateMapBounds();
 };
@@ -130,9 +130,9 @@ const deleteShapes = (features: GeoJSON.Feature[]) => {
   features.forEach((feature) => {
     if (map.value) {
       const featureId = String(feature.id);
-      
+
       // Find the dataset that contains this feature
-      const datasetToDelete = datasets.value.find(dataset => 
+      const datasetToDelete = datasets.value.find(dataset =>
         dataset.geojson?.features.some(f => String(f.id) === featureId)
       );
 
@@ -156,8 +156,11 @@ const deleteShapes = (features: GeoJSON.Feature[]) => {
           map.value.removeSource(sourceId);
         }
 
-        // Remove from store
-        store.removeDataset(datasetToDelete.id);
+        // Use the store's deleteDataset method instead of removeDataset
+        store.deleteDataset(datasetToDelete.id);
+
+        // Mark that we have unsaved changes
+        store.hasUnsavedChanges = true;
       }
     }
   });
@@ -176,10 +179,10 @@ const initializeMap = () => {
         center: [0, 0],
         zoom: 1,
       })
-      
+
       map.value.addControl(new mapboxgl.NavigationControl())
       map.value.addControl(new mapboxgl.FullscreenControl())
-      
+
       map.value.on('load', () => {
         console.log('Map loaded successfully')
         loadDefaultGeoJSON()
@@ -220,13 +223,13 @@ const loadDefaultGeoJSON = () => {
 const loadGeoJSONData = async (dataset: Dataset) => {
   if (map.value) {
     const geojsonData = dataset.geojson || await readFileAsJSON(dataset.file)
-    
+
     if (!dataset.geojson) {
       store.updateDatasetGeoJSON(dataset.id, geojsonData)
     }
 
     const bounds = new mapboxgl.LngLatBounds()
-    
+
     geojsonData.features.forEach((feature: any) => {
       if (feature.geometry.type === 'Polygon') {
         feature.geometry.coordinates[0].forEach((coord: [number, number]) => {
@@ -302,14 +305,14 @@ const updateMapBounds = () => {
               });
               hasValidBounds = true;
               break;
-            
+
             case 'LineString':
               feature.geometry.coordinates.forEach((coord: number[]) => {
                 bounds.extend(coord as [number, number]);
               });
               hasValidBounds = true;
               break;
-            
+
             case 'Point':
               bounds.extend(feature.geometry.coordinates as [number, number]);
               hasValidBounds = true;
@@ -380,7 +383,7 @@ watch(
 
 const loadSavedShapes = async () => {
   if (!map.value) return;
-  
+
   const savedShapes = JSON.parse(localStorage.getItem('savedShapes') || '[]');
   console.log('Retrieved saved shapes:', savedShapes);
 
@@ -398,7 +401,7 @@ const loadSavedShapes = async () => {
       if (dataset.geojson) {
         try {
           await loadGeoJSONData(dataset);
-          
+
           // Add to draw if it's a drawn shape
           if (draw.value && dataset.geojson.features[0]) {
             draw.value.add(dataset.geojson.features[0]);
@@ -582,7 +585,7 @@ onMounted(() => {
       initializeMeasurement(map.value)
     }
   })
-  
+
   window.addEventListener('keydown', handleKeyPress)
 })
 
@@ -603,21 +606,14 @@ onUnmounted(() => {
       </div>
     </div>
     <div ref="mapContainer" class="h-full w-full">
-      <MapHoverCard
-        v-if="hoveredFeature"
-        :feature="hoveredFeature"
-        class="absolute z-50 pointer-events-none"
-        :style="{
-          left: `${hoverCoordinates.x + 10}px`,
-          top: `${hoverCoordinates.y + 10}px`
-        }"
-      />
+      <MapHoverCard v-if="hoveredFeature" :feature="hoveredFeature" class="absolute z-50 pointer-events-none" :style="{
+        left: `${hoverCoordinates.x + 10}px`,
+        top: `${hoverCoordinates.y + 10}px`
+      }" />
     </div>
-    <button
-      @click="toggleMeasurement(map!)"
+    <button @click="toggleMeasurement(map!)"
       class="absolute top-4 left-16 px-4 py-2 bg-black/75 rounded-md shadow-md z-10 hover:bg-black/90 transition-all duration-200"
-      :class="{ 'bg-red-500/90 hover:bg-red-500': isMeasuring }"
-    >
+      :class="{ 'bg-red-500/90 hover:bg-red-500': isMeasuring }">
       <span class="flex items-center gap-2 font-medium text-white">
         <span v-if="isMeasuring">
           <span class="flex items-center gap-2">
@@ -639,7 +635,7 @@ onUnmounted(() => {
 
 .mapboxgl-ctrl-group {
   margin: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .mapboxgl-ctrl-group button {
@@ -661,4 +657,3 @@ onUnmounted(() => {
   transition-duration: 200ms;
 }
 </style>
-

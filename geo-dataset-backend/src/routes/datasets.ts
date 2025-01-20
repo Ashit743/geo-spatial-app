@@ -33,15 +33,42 @@ router.post('/', authenticateJWT, async (req, res) => {
 
     const { datasets } = req.body;
 
-    // Ensure datasets is an array
+    // Handle case where all datasets are being removed
+    if (!datasets || (Array.isArray(datasets) && datasets.length === 0)) {
+      // Delete all datasets for this user
+      const deleteResult = await Dataset.deleteMany({ user: user._id });
+      res.status(200).json({
+        message: 'All datasets removed',
+        savedDatasets: [],
+        errors: [],
+        deletedCount: deleteResult.deletedCount || 0,
+        totalProcessed: 0,
+        successCount: 0,
+        errorCount: 0
+      });
+      return;
+    }
+
+    // Rest of your existing code for handling datasets...
     const datasetsArray = Array.isArray(datasets) ? datasets : [datasets];
 
+    // Get all dataset names from the request
+    const incomingDatasetNames = datasetsArray.map(d => d.name);
+
+    // Find and remove datasets that exist in DB but not in the incoming request
+    const deletedDatasets = await Dataset.deleteMany({
+      user: user._id,
+      name: { $nin: incomingDatasetNames }
+    });
+
     const results: {
-      savedDatasets: (Document<unknown, {}, IDataset> & IDataset)[];
+      savedDatasets: any[];  // or more specifically: (Document<unknown, {}, IDataset> & IDataset)[]
       errors: { name: string; error: string; }[];
+      deletedCount: number;
     } = {
       savedDatasets: [],
-      errors: []
+      errors: [],
+      deletedCount: deletedDatasets.deletedCount || 0
     };
 
     // Process each dataset
@@ -97,6 +124,7 @@ router.post('/', authenticateJWT, async (req, res) => {
       message: 'Datasets processing completed',
       savedDatasets: results.savedDatasets,
       errors: results.errors,
+      deletedCount: results.deletedCount,
       totalProcessed: datasetsArray.length,
       successCount: results.savedDatasets.length,
       errorCount: results.errors.length
@@ -105,11 +133,11 @@ router.post('/', authenticateJWT, async (req, res) => {
 
   } catch (error) {
     console.error('Error processing datasets:', error);
-    res.status(500).json({
+     res.status(500).json({
       message: 'Error processing datasets',
       error: error instanceof Error ? error.message : 'Unknown error'
     });
-    return
+    return;
   }
 });
 

@@ -65,10 +65,12 @@ const toggleSidebar = () => {
 
 const handleDeleteDataset = (id: string) => {
   store.deleteDataset(id)
+  store.hasUnsavedChanges = true
 }
 
 const handleClearAll = () => {
   store.clearAllDatasets()
+  store.hasUnsavedChanges = true
   isDialogOpen.value = false
 }
 
@@ -76,22 +78,14 @@ const closeDialog = () => {
   isDialogOpen.value = false
 }
 
+const showSaveButton = computed(() => {
+  return store.datasets.length > 0 || store.hasUnsavedChanges;
+})
+
 const handleSaveDatasets = async () => {
   try {
-    // Filter out already saved datasets
-    const unsavedDatasets = store.datasets.filter(dataset => !dataset.isSaved);
-
-    if (unsavedDatasets.length === 0) {
-      toast({
-        title: "Info",
-        description: "No new datasets to save.",
-        variant: "default",
-      });
-      return;
-    }
-
-    // Prepare datasets for saving
-    const datasetsToSave = unsavedDatasets.map(dataset => ({
+    // Get all current datasets
+    const currentDatasets = store.datasets.map(dataset => ({
       name: dataset.name,
       file: dataset.file.name,
       visible: dataset.visible,
@@ -100,20 +94,24 @@ const handleSaveDatasets = async () => {
       selected: dataset.selected
     }));
 
-    // Send all datasets at once
-    const response = await createDataset(datasetsToSave);
+    // Send current datasets (even if empty array)
+    const response = await createDataset(currentDatasets);
 
-    // Mark saved datasets
-    response.savedDatasets.forEach((savedDataset: any) => {
-      const dataset = store.datasets.find(d => d.name === savedDataset.name);
-      if (dataset) {
-        dataset.isSaved = true;
-      }
+    // Reset flags
+    store.hasUnsavedChanges = false;
+    store.datasets.forEach(dataset => {
+      dataset.isSaved = true;
     });
+
+    // Show success message with save and delete counts
+    const message = currentDatasets.length === 0
+      ? `Successfully removed all datasets`
+      : `Successfully saved ${response.savedDatasets.length} dataset(s)` +
+      (response.deletedCount > 0 ? ` and removed ${response.deletedCount} old dataset(s)` : '');
 
     toast({
       title: "Success",
-      description: `Successfully saved ${response.savedDatasets.length} dataset(s)`,
+      description: message,
     });
 
   } catch (error) {
@@ -166,8 +164,7 @@ const handleSaveDatasets = async () => {
                   <span>Datasets</span>
                 </div>
                 <div class="flex gap-2">
-                  <Button variant="default" size="sm" class="gap-2" @click="handleSaveDatasets"
-                    v-if="store.datasets.length > 0">
+                  <Button variant="default" size="sm" class="gap-2" @click="handleSaveDatasets" v-if="showSaveButton">
                     Save All
                   </Button>
                   <Dialog v-model:open="isDialogOpen">
