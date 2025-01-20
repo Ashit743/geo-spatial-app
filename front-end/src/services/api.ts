@@ -1,11 +1,20 @@
 import axios from 'axios';
 
-const API_URL = 'https://geo-spatial-app.onrender.com/'; // Replace with your API URL
+const API_URL = 'http://localhost:3000/'; // Replace with your API URL
 
 export interface Dataset {
   id: string;
   name: string;
   file: File;
+  visible: boolean;
+  layerId: string;
+  geojson: any;
+  selected: boolean;
+}
+
+export interface SaveDatasetDTO {
+  name: string;
+  file: string; // This will be the filename
   visible: boolean;
   layerId: string;
   geojson: any;
@@ -42,21 +51,14 @@ export const getDatasets = async (): Promise<Dataset[]> => {
   return response.data;
 };
 
-export const createDataset = async (dataset: Omit<Dataset, 'id'>): Promise<Dataset> => {
-  const formData = new FormData();
-  formData.append('name', dataset.name);
-  formData.append('file', dataset.file);
-  formData.append('visible', String(dataset.visible));
-  formData.append('layerId', dataset.layerId);
-  formData.append('geojson', JSON.stringify(dataset.geojson));
-  formData.append('selected', String(dataset.selected));
-
-  const response = await api.post('/datasets', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data;
+export const createDataset = async (dataset: SaveDatasetDTO): Promise<Dataset> => {
+  try {
+    const response = await api.post('/datasets', dataset);
+    return response.data;
+  } catch (error) {
+    console.error('Error in createDataset:', error);
+    throw error;
+  }
 };
 
 export const updateDataset = async (id: string, dataset: Partial<Dataset>): Promise<Dataset> => {

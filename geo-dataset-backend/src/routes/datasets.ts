@@ -28,13 +28,21 @@ router.post('/', authenticateJWT, async (req, res) => {
       res.status(401).json({ message: 'Unauthorized' });
       return;
     }
+
     const newDataset = new Dataset({
-      ...req.body,
+      name: req.body.name,
+      file: req.body.file,
+      visible: req.body.visible,
+      layerId: req.body.layerId,
+      geojson: req.body.geojson,
+      selected: req.body.selected,
       user: user._id
     });
+
     const savedDataset = await newDataset.save();
     res.status(201).json(savedDataset);
   } catch (error) {
+    console.error('Error saving dataset:', error);
     res.status(400).json({ message: 'Error saving dataset', error: error });
   }
 });

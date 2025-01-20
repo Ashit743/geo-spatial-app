@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { createDataset } from '@/services/api'
 
 const store = useDatasetStore()
 const isCollapsed = ref(false)
@@ -72,6 +73,34 @@ const handleClearAll = () => {
 const closeDialog = () => {
   isDialogOpen.value = false
 }
+
+const handleSaveDatasets = async () => {
+  try {
+    for (const dataset of store.datasets) {
+      // Transform the dataset to match backend expectations
+      const datasetToSave = {
+        name: dataset.name,
+        file: dataset.file.name, // Convert File object to string (filename)
+        visible: dataset.visible,
+        layerId: dataset.layerId,
+        geojson: dataset.geojson,
+        selected: dataset.selected
+      };
+      
+      // Log the transformed data for debugging
+      console.log('Saving dataset:', datasetToSave);
+      
+      const savedDataset = await createDataset(datasetToSave);
+      console.log('Successfully saved dataset:', savedDataset);
+    }
+    // Show success message
+    // You might want to add a toast notification here
+  } catch (error) {
+    console.error('Error saving datasets:', error);
+    // Show error message
+    // You might want to add a toast notification here
+  }
+}
 </script>
 
 <template>
@@ -119,31 +148,42 @@ const closeDialog = () => {
                   <MapIcon class="h-5 w-5" />
                   <span>Datasets</span>
                 </div>
-                <Dialog v-model:open="isDialogOpen">
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="destructive" 
-                      size="sm" 
-                      class="gap-2"
-                      v-if="store.datasets.length > 0"
-                    >
-                      <Trash2 class="h-4 w-4" />
-                      Clear All
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Clear All Datasets</DialogTitle>
-                      <DialogDescription>
-                        Are you sure you want to remove all datasets? This action cannot be undone.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button variant="outline" @click="closeDialog">Cancel</Button>
-                      <Button variant="destructive" @click="handleClearAll">Clear All</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <div class="flex gap-2">
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    class="gap-2"
+                    @click="handleSaveDatasets"
+                    v-if="store.datasets.length > 0"
+                  >
+                    Save All
+                  </Button>
+                  <Dialog v-model:open="isDialogOpen">
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        class="gap-2"
+                        v-if="store.datasets.length > 0"
+                      >
+                        <Trash2 class="h-4 w-4" />
+                        Clear All
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Clear All Datasets</DialogTitle>
+                        <DialogDescription>
+                          Are you sure you want to remove all datasets? This action cannot be undone.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button variant="outline" @click="closeDialog">Cancel</Button>
+                        <Button variant="destructive" @click="handleClearAll">Clear All</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
