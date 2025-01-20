@@ -51,9 +51,9 @@ export const getDatasets = async (): Promise<Dataset[]> => {
   return response.data;
 };
 
-export const createDataset = async (dataset: SaveDatasetDTO): Promise<Dataset> => {
+export const createDataset = async (datasets: SaveDatasetDTO | SaveDatasetDTO[]): Promise<any> => {
   try {
-    const response = await api.post('/datasets', dataset);
+    const response = await api.post('/datasets', { datasets });
     return response.data;
   } catch (error) {
     console.error('Error in createDataset:', error);
