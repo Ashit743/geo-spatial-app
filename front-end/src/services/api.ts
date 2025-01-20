@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { type Dataset } from '@/stores/useDatasetStore';
 
-const API_URL = 'http://localhost:3000/'; // Replace with your API URL
+const API_URL = 'https://geo-spatial-app.onrender.com/'; // Replace with your API URL
 
 export interface SaveDatasetDTO {
   name: string;
