@@ -611,19 +611,22 @@ onUnmounted(() => {
         }"
       />
     </div>
-    <div class="absolute top-4 left-16 px-4 py-2 bg-black/75 rounded-md shadow-md z-10">
-      <span class="font-semibold text-sm text-white">
-        {{ isMeasuring ? '📏 Distance Measurement Mode' : '✏️ Shape Drawing Mode' }}
-      </span>
-    </div>
     <button
       @click="toggleMeasurement(map!)"
-      class="absolute bottom-4 right-4 px-4 py-2 bg-black/75 rounded-md shadow-md z-10 hover:bg-black/90"
+      class="absolute top-4 left-16 px-4 py-2 bg-black/75 rounded-md shadow-md z-10 hover:bg-black/90 transition-all duration-200"
       :class="{ 'bg-red-500/90 hover:bg-red-500': isMeasuring }"
     >
       <span class="flex items-center gap-2 font-medium text-white">
-        <span v-if="isMeasuring">❌ Exit Measurement</span>
-        <span v-else>📏 Measure Distance</span>
+        <span v-if="isMeasuring">
+          <span class="flex items-center gap-2">
+            ❌ Exit Measurement
+          </span>
+        </span>
+        <span v-else>
+          <span class="flex items-center gap-2">
+            📏 Measure
+          </span>
+        </span>
       </span>
     </button>
   </div>
@@ -643,6 +646,17 @@ onUnmounted(() => {
 
 .mapboxgl-ctrl-group button:hover {
   background-color: #f8f8f8;
+}
+</style>
+
+<style scoped>
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-200 {
+  transition-duration: 200ms;
 }
 </style>
 
