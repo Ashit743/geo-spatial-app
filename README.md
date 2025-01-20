@@ -1,5 +1,41 @@
 # Geospatial Dataset Application
 
+# Features
+
+- 🗺️ Interactive map visualization using Mapbox GL
+- 🎨 Dark/Light theme support
+- 🔐 User authentication and authorization
+- 📊 GeoJSON data management
+- 📏 Distance measurement tools
+- 🎯 Custom shape drawing and editing
+- 💾 Data persistence with MongoDB
+- 🌐 Real-time data updates
+
+## Tech Stack
+
+### Frontend
+- Vue 3 with TypeScript
+- Vite for build tooling
+- Pinia for state management
+- Mapbox GL for map rendering
+- TailwindCSS for styling
+- Radix Vue for UI components
+
+### Backend
+- Node.js with Express
+- TypeScript
+- MongoDB with Mongoose
+- JWT for authentication
+- Passport.js for authorization
+
+## Prerequisites
+
+- Node.js v14 or higher
+- npm v6 or higher
+- MongoDB (local installation or Atlas URI)
+- Mapbox API token
+
+
 ## Quick Start Guide
 
 ### Environment Variables
@@ -53,14 +89,21 @@ npm run build
 npm run serve
 ```
 
-### Development URLs
+# API Endpoints
+
+### Authentication
+- POST `/auth/register` - Create new user account
+- POST `/auth/login` - User login
+
+### Datasets
+- GET `/datasets` - Retrieve all datasets
+- POST `/datasets` - Create new dataset
+- PUT `/datasets/:id` - Update dataset
+- DELETE `/datasets/:id` - Delete dataset
+
+## Development URLs
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3000
-
-### System Requirements
-- Node.js v14 or higher
-- npm v6 or higher
-- MongoDB (local or Atlas)
 
 ### Notes
 - Ensure MongoDB is running before starting the backend
