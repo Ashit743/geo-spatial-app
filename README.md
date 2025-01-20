@@ -1,5 +1,6 @@
 # Geospatial Dataset Application
 Check out the live demo at https://geo-spatial.netlify.app/
+(in live preview the api calls will take longer time about 50s for the first time as this is a free service on render)
 
 # Features
 
