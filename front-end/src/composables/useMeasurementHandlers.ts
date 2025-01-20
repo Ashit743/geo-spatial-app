@@ -1,5 +1,6 @@
 import type mapboxgl from 'mapbox-gl'
 import type { MeasurementPoint, MeasurementLine } from '@/types/measurement'
+import type { Ref } from 'vue'
 
 export function useMeasurementHandlers() {
   const createPoint = (lngLat: mapboxgl.LngLat, groupId?: number): MeasurementPoint => ({

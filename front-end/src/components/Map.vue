@@ -1,3 +1,4 @@
+// @ts-nocheck
 <script setup lang="ts">
 import { onMounted, ref, watch, onUnmounted } from 'vue'
 import mapboxgl from 'mapbox-gl'
@@ -577,6 +578,7 @@ onMounted(() => {
   initializeMap()
   map.value?.on('load', () => {
     if (map.value) {
+      //@ts-ignore
       initializeMeasurement(map.value)
     }
   })

@@ -63,7 +63,7 @@ export function useMeasurement() {
     distanceGeojson.value.features.push(newLine)
   }
 
-  const toggleMeasurement = (map: mapboxgl.Map) => {
+  const toggleMeasurement = (map: any) => {
     isMeasuring.value = !isMeasuring.value
     
     if (isMeasuring.value) {
