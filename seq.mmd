@@ -1,0 +1,73 @@
+sequenceDiagram
+    actor User
+    participant Frontend as Vue Frontend
+    participant AuthStore as Auth Store
+    participant DataStore as Dataset Store
+    participant Map as Map Component
+    participant API as API Service
+    participant Backend as Express Backend
+    participant GeoProc as GeoJSON Processor
+    participant DB as MongoDB
+
+    %% Authentication Flow
+    User->>Frontend: Access Application
+    Frontend->>Frontend: Check Token
+    alt No Valid Token
+        User->>Frontend: Login/Register
+        Frontend->>API: POST /auth/login or /auth/register
+        API->>Backend: Validate Credentials
+        Backend->>DB: Query User
+        DB-->>Backend: User Data
+        Backend->>Backend: Generate JWT
+        Backend-->>Frontend: Return Token
+        Frontend->>AuthStore: Store Token
+    end
+
+    %% Map Initialization
+    User->>Frontend: Navigate to Map Page
+    Frontend->>Map: Initialize Map Component
+    Map->>API: Load Saved Datasets
+    API->>Backend: GET /datasets
+    Backend->>DB: Query User's Datasets
+    DB-->>Backend: Dataset Collection
+    Backend-->>Map: GeoJSON Data
+    Map->>Map: Render Map with Datasets
+
+    %% Dataset Operations
+    alt Upload Dataset
+        User->>Frontend: Upload GeoJSON File
+        Frontend->>GeoProc: Validate GeoJSON Format
+        GeoProc-->>Frontend: Validation Result
+        alt Valid GeoJSON
+            Frontend->>DataStore: Process File
+            DataStore->>API: POST /datasets
+            API->>Backend: Save Dataset
+            Backend->>DB: Store Dataset
+            DB-->>Backend: Confirmation
+            Backend-->>Frontend: Success Response
+            Frontend->>Map: Update Map View
+        else Invalid GeoJSON
+            Frontend-->>User: Show Error Message
+        end
+    end
+
+    %% Drawing Operations
+    alt Draw Shape
+        User->>Map: Draw on Map
+        Map->>GeoProc: Convert to GeoJSON
+        GeoProc-->>Map: GeoJSON Format
+        Map->>DataStore: Save New Shape
+        DataStore->>API: POST /datasets
+        API->>Backend: Save Shape
+        Backend->>DB: Store Shape
+        DB-->>Backend: Confirmation
+        Backend-->>Map: Success Response
+        Map->>Map: Update Display
+    end
+
+    %% Layer Management
+    alt Toggle Layer
+        User->>Frontend: Toggle Layer Visibility
+        Frontend->>Map: Update Layer State
+        Map->>Map: Toggle Layer Display
+    end
