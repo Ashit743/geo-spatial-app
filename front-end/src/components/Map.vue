@@ -8,6 +8,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import MapHoverCard from './MapHoverCard.vue'
 import * as turf from '@turf/turf'
+import { useMeasurement } from '@/composables/useMeasurement'
 
 const store = useDatasetStore()
 const { datasets, visibleDatasets, defaultGeoJSON } = storeToRefs(store)
@@ -28,7 +29,8 @@ if (!mapboxToken) {
 
 const draw = ref<any>(null);
 const measureDraw = ref<any>(null);
-const isMeasuring = ref(false);
+const { isMeasuring, initializeMeasurement, toggleMeasurement, handleEscape } = useMeasurement()
+const startNewMeasurement = ref(true);
 
 const hoveredFeature = ref<any>(null);
 const hoverPopup = ref<mapboxgl.Popup | null>(null);
@@ -512,28 +514,6 @@ const initializeDrawingControls = () => {
   });
 };
 
-const toggleMeasurement = () => {
-  isMeasuring.value = !isMeasuring.value;
-
-  if (isMeasuring.value) {
-    // Switch to measurement mode
-    map.value?.removeControl(draw.value);
-    map.value?.addControl(measureDraw.value, 'top-left');
-    measureDraw.value.changeMode('draw_line_string');
-
-    // Update measurements for existing lines
-    const features = measureDraw.value.getAll().features;
-    features.forEach(feature => {
-      updateMeasurement({ features: [feature] });
-    });
-  } else {
-    // Switch back to shape drawing mode
-    map.value?.removeControl(measureDraw.value);
-    map.value?.addControl(draw.value, 'top-left');
-    measureDraw.value.deleteAll(); // Clear measurements
-  }
-};
-
 const updateMeasurement = (e: any) => {
   if (!isMeasuring.value) return;
 
@@ -586,11 +566,26 @@ const updateMeasurement = (e: any) => {
   });
 };
 
+// Handle escape key
+const handleKeyPress = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    handleEscape()
+  }
+};
+
 onMounted(() => {
   initializeMap()
+  map.value?.on('load', () => {
+    if (map.value) {
+      initializeMeasurement(map.value)
+    }
+  })
+  
+  window.addEventListener('keydown', handleKeyPress)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyPress)
   if (map.value) {
     map.value.remove()
   }
@@ -622,7 +617,7 @@ onUnmounted(() => {
       </span>
     </div>
     <button
-      @click="toggleMeasurement"
+      @click="toggleMeasurement(map!)"
       class="absolute bottom-4 right-4 px-4 py-2 bg-black/75 rounded-md shadow-md z-10 hover:bg-black/90"
       :class="{ 'bg-red-500/90 hover:bg-red-500': isMeasuring }"
     >
