@@ -3,6 +3,8 @@ import type { DirectiveBinding } from 'vue'
 export const vResizable = {
   mounted(el: HTMLElement, binding: DirectiveBinding) {
     const direction = binding.arg || 'horizontal'
+    const minWidth = 250 // minimum width in pixels
+    
     const startResize = (e: MouseEvent) => {
       e.preventDefault()
       document.addEventListener('mousemove', resize)
@@ -11,8 +13,12 @@ export const vResizable = {
 
     const resize = (e: MouseEvent) => {
       if (direction === 'horizontal') {
+        // Calculate max width as half of the viewport width
+        const maxWidth = window.innerWidth / 2
+        // Calculate new width
         const newWidth = document.body.clientWidth - e.clientX
-        el.style.width = `${newWidth}px`
+        // Apply width within constraints
+        el.style.width = `${Math.min(Math.max(newWidth, minWidth), maxWidth)}px`
       } else {
         const newHeight = document.body.clientHeight - e.clientY
         el.style.height = `${newHeight}px`
