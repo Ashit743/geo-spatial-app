@@ -13,4 +13,4 @@ steps:
         --platform managed \
         --region us-central1 \
         --allow-unauthenticated
-timeout: 900s
+timeout: 800s
