@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { type Dataset } from '@/stores/useDatasetStore';
 
-const API_URL = 'http://localhost:8080'; // Replace with your API URL
+const API_URL = 'https://my-demo-app-534281060187.us-central1.run.app'; // Replace with your API URL
 
 export interface SaveDatasetDTO {
   name: string;
