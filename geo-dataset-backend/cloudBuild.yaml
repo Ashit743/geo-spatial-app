@@ -1,7 +1,8 @@
 steps:
   # Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-demo-app', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/geo-dataset-backend', '.']
+    dir: 'geo-dataset-backend'
 
   # Deploy to Cloud Run with secrets
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -9,7 +10,7 @@ steps:
       - 'run'
       - 'deploy'
       - 'my-demo-app'
-      - '--image=gcr.io/$PROJECT_ID/my-demo-app'
+      - '--image=gcr.io/$PROJECT_ID/geo-dataset-backend'
       - '--region=us-central1'
       - '--platform=managed'
       - '--set-secrets=MONGO_URI=demo-env-vars:latest'  # Syntax: ENV_VAR_NAME=SECRET_NAME:VERSION
