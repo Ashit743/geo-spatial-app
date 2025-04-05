@@ -15,10 +15,13 @@ steps:
       - '--set-secrets=MONGO_URI=demo-env-vars:latest'  # Syntax: ENV_VAR_NAME=SECRET_NAME:VERSION
       - '--allow-unauthenticated'
     secretEnv: ['MONGO_URI']
+
 availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/demo-env-vars/versions/latest
       env: 'MONGO_URI'
+
+serviceAccount: '534281060187@cloudbuild.gserviceaccount.com'
+
 options:
-  serviceAccount: '534281060187-compute@developer.gserviceaccount.com'
-logging: CLOUD_LOGGING_ONLY
+  logging: CLOUD_LOGGING_ONLY
