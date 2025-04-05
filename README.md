@@ -44,12 +44,12 @@ Check out the live demo at https://geo-spatial.netlify.app/
 
 #### Frontend (.env)
 env
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=http://localhost:8080
 VITE_MAPBOX_TOKEN=your_mapbox_token
 
 #### Backend (.env)
 env
-PORT=3000
+PORT=8080
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
 
@@ -105,7 +105,7 @@ npm run serve
 
 ## Development URLs
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:3000
+- Backend API: http://localhost:8080
 
 ### Notes
 - Ensure MongoDB is running before starting the backend
